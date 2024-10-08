@@ -1,9 +1,16 @@
 # General Preference Model (GPM)
-This repository is designed for training and evaluating the General Preference reward model. It includes the following:
 
-* Training code for both General Preference reward model and Bradley Terry reward model.
+General Preference Modeling with Preference Representations for Aligning Language Models, [https://arxiv.org/abs/2410.02197](https://arxiv.org/abs/2410.02197)
 
-* Evaluation code adapted from [RewardBench](https://github.com/allenai/reward-bench) for evaluating General Preference reward model.
+As Huggingface Daily Papers: [https://huggingface.co/papers/2410.02197](https://huggingface.co/papers/2410.02197)
+
+## Introduction
+
+This repository is designed for training and evaluating the General Preference representation model (GPM). It includes the following:
+
+* Training code for both GPM and BT reward models.
+
+* Evaluation code adapted from [RewardBench](https://github.com/allenai/reward-bench) for evaluating GPM and BT RM.
 
 ## Key Components:
 
@@ -32,6 +39,3 @@ pip install -e .
 ```
 
 ## BibTeX
-General Preference Modeling with Preference Representations for Aligning Language Models, [https://arxiv.org/abs/2410.02197](https://arxiv.org/abs/2410.02197)
-
-As Huggingface Daily Papers: [https://huggingface.co/papers/2410.02197](https://huggingface.co/papers/2410.02197)
