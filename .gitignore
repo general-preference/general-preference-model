@@ -1,0 +1,45 @@
+wandb/
+wandb/*
+
+results/
+results/*
+
+rewardbench_eval/results/
+rewardbench_eval/results/*
+
+deploy
+delpoy/*
+
+hostfile
+scripts/hostfile
+# Operating system files
+.DS_Store
+Thumbs.db
+*~
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+# Log files
+*.log
+# Temporary files
+*.tmp
+# Docker
+.env
+# Archives
+*.zip
+*.tar.gz
+# Python build files
+build/
+dist/
+*.egg-info/
+*.eggs/
+
+
+

@@ -1,0 +1,4 @@
+{"instruction": "Which character do you prefer? Choose one from [A, B, C, D].", "chosen": "A","reject":"B", "label": 0}
+{"instruction": "Which character do you prefer? Choose one from [A, B, C, D].", "chosen": "B","reject":"C", "label": 1}
+{"instruction": "Which character do you prefer? Choose one from [A, B, C, D].", "chosen": "C","reject":"D", "label": 2}
+{"instruction": "Which character do you prefer? Choose one from [A, B, C, D].", "chosen": "D","reject":"A", "label": 3}

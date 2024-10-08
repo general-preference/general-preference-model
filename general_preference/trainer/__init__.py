@@ -1,0 +1,1 @@
+from .rm_trainer_general_preference import GeneralPreferenceRewardTrainer
