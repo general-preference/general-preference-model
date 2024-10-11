@@ -38,4 +38,15 @@ pip install torch==2.3.0
 pip install -e .
 ```
 
-## BibTeX
+## Citations
+
+Please cite the paper and star this repo if you use the General Preference representation Model (GPM) and GPO and find it interesting/useful, thanks! Feel free to contact zhangge19951114@gmail.com | zhangyif21@mails.tsinghua.edu.cn or open an issue if you have any questions.
+
+```
+@article{zhang2024general,
+  title={General Preference Modeling with Preference Representations for Aligning Language Models},
+  author={Zhang, Yifan and Zhang, Ge and Wu, Yue and Xu, Kangping and Gu, Quanquan},
+  journal={arXiv preprint arXiv:2410.02197},
+  year={2024}
+}
+```
