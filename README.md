@@ -42,7 +42,7 @@ pip install -e .
 
 Below is an example code snippet (see `./gpm_example_usage.py`):
 
-```
+```python
 prompt_text = "Describe the importance of reading books in today's digital age."
 response1 = "Books remain crucial in the digital era, offering in-depth knowledge and fostering critical thinking. They provide a unique, immersive experience that digital media can't replicate, contributing significantly to personal and intellectual growth."
 response2 = "Books are still useful for learning new things. They help you relax and can be a good break from screens."
