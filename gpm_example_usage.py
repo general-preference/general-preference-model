@@ -128,7 +128,7 @@ class GPMPipeline:
         self.truncation = truncation
         self.max_length = max_length
         self.padding = padding
-        self.tau = 0.1
+        self.tau = tau
         
         config = AutoConfig.from_pretrained(model_name_or_path, trust_remote_code=True)
         config._attn_implementation = "flash_attention_2" 
