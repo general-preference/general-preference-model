@@ -38,6 +38,43 @@ pip install torch==2.3.0
 pip install -e .
 ```
 
+## Example Usage of the GPM
+
+Below is an example code snippet (see `./gpm_example_usage.py`):
+
+```
+prompt_text = "Describe the importance of reading books in today's digital age."
+response1 = "Books remain crucial in the digital era, offering in-depth knowledge and fostering critical thinking. They provide a unique, immersive experience that digital media can't replicate, contributing significantly to personal and intellectual growth."
+response2 = "Books are still useful for learning new things. They help you relax and can be a good break from screens."
+
+context1 = [
+    {"role": "user", "content": prompt_text},
+    {"role": "assistant", "content": response1}
+]
+
+context2 = [
+    {"role": "user", "content": prompt_text},
+    {"role": "assistant", "content": response2}
+]
+
+rm = GPMPipeline("general-preference/GPM-Llama-3.1-8B", value_head_dim=6)
+
+reward1, prompt_hidden_state = rm([context1], return_prompt=True)
+reward2 = rm([context2])
+
+result = generate_high_dim_result_with_prompt(rm.model, rm.value_head_dim, reward1, reward2, prompt_hidden_state)
+
+result_batch = result.float().cpu().detach().numpy().tolist()
+
+results = []
+[
+    results.append(1) if result > 0 else results.append(0)
+    for result in result_batch
+]
+
+print(result_batch)
+```
+
 ## Citations
 
 Please cite the paper and star this repo if you use the General Preference representation Model (GPM) and GPO and find it interesting/useful, thanks! Feel free to contact zhangge19951114@gmail.com | zhangyif21@mails.tsinghua.edu.cn or open an issue if you have any questions.
