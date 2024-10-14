@@ -22,7 +22,7 @@ setup(
     description="A tool for training and evaluating General Preference reward model",
     author="Grace Zhang",
     author_email="zhangge@sqz.ac.cn",
-    url="https://github.com/general-preference",
+    url="https://github.com/general-preference/general-preference-model.git",
     classifiers=[
         "Programming Language :: Python :: 3.10",
         "License :: OSI Approved :: Apache Software License",

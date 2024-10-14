@@ -15,7 +15,7 @@
 # Modifications:
 # - Grace 2024-08-24: I added some arguments, modified model configuration, 
 # RewardBench pipeline, and result calculation method to adapt to 
-# custom General Preference model.
+# custom General Preference Model.
 
 
 import argparse
@@ -32,7 +32,7 @@ from fastchat.conversation import get_conv_template
 from tqdm import tqdm
 from transformers import AutoTokenizer, pipeline, AutoModel
 from general_preference.models import get_reward_model
-from rewardbench_utils import CustomLeftPadRewardBenchPipeline, CustomRightPadRewardBenchPipeline, generate_high_dim_result, generate_high_dim_result_with_prompt
+from rewardbench_utils import CustomLeftPadRewardBenchPipeline, generate_high_dim_result, generate_high_dim_result_with_prompt
 
 from rewardbench import (
     REWARD_MODEL_CONFIG,
