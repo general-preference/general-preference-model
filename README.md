@@ -77,7 +77,7 @@ print(result_batch)
 
 ## Citations
 
-Please cite the paper and star this repo if you use the General Preference representation Model (GPM) and GPO and find it interesting/useful, thanks! Feel free to contact zhangge19951114@gmail.com | zhangyif21@mails.tsinghua.edu.cn or open an issue if you have any questions.
+Please cite the paper and star this repo if you use the General Preference Representation Model (GPM) and General Preference Optimization (GPO) and find it interesting/useful, thanks! Feel free to contact zhangge19951114@gmail.com | zhangyif21@mails.tsinghua.edu.cn or open an issue if you have any questions.
 
 ```
 @article{zhang2024general,
