@@ -34,20 +34,35 @@ class CustomLeftPadRewardBenchPipeline:
         with torch.no_grad():
             rewards, outputs = self.model.custom_forward(**inputs, return_output=return_prompt)
 
+        chosen_response_len_list = []
         if return_prompt:
-            # Compute prompt hidden states
             prompt_texts = [self.tokenizer.apply_chat_template([sample[0]], tokenize=False) for sample in samples]
-            prompt_lengths = [len(self.tokenizer(prompt_text, padding=False, return_tensors="pt")["input_ids"][0]) for prompt_text in prompt_texts]
-
-            prompt_lengths = torch.tensor(prompt_lengths, device="cuda")
-            prompt_end_indices = prompt_lengths - 1
-
-            last_hidden_states = outputs.last_hidden_state
-            prompt_hidden_states = last_hidden_states[torch.arange(len(samples)), prompt_end_indices, :]
-
-            return rewards, prompt_hidden_states
-
-        return rewards
+            for i in range(len(input_texts)):
+                prompt_token = self.tokenizer(
+                    prompt_texts[i],
+                    max_length=self.max_length,
+                    padding=False,
+                    truncation=True,
+                    return_tensors="pt",
+                )
+                chosen_token = self.tokenizer(
+                    input_texts[i],
+                    max_length=self.max_length,
+                    padding=False,
+                    truncation=True,
+                    return_tensors="pt",
+                )
+                chosen_response_len = chosen_token["attention_mask"].sum() - prompt_token["attention_mask"].sum()
+                chosen_response_len_list.append(chosen_response_len)
+        chosen_response_len = torch.tensor(chosen_response_len_list).view(-1, 1).to("cuda")
+        if return_prompt:   
+            chosen_last_hidden_states = outputs["last_hidden_state"]
+            prompt_end_index = chosen_last_hidden_states.size(1) - chosen_response_len - 1
+            prompt_end_index_expanded = prompt_end_index.unsqueeze(-1).expand(-1, -1, chosen_last_hidden_states.size(-1))
+            prompt_hidden_state = torch.gather(chosen_last_hidden_states, dim=1, index=prompt_end_index_expanded).squeeze(1)
+            return rewards, prompt_hidden_state
+        else:
+            return rewards   
 
 def generate_high_dim_result(value_head_dim, chosen_reward, rejected_reward):
     R_matrix = torch.zeros((value_head_dim, value_head_dim), device=chosen_reward.device, dtype=chosen_reward.dtype)
