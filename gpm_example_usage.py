@@ -3,7 +3,10 @@ import torch
 import torch.nn as nn
 from transformers import AutoConfig, AutoModel, AutoModelForCausalLM
 import torch.nn.functional as F
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer     
+import os
+from safetensors.torch import load_file
+from huggingface_hub import snapshot_download
 
 def get_tokenizer(pretrain, model, padding_side="left", use_fast=True):
     tokenizer = AutoTokenizer.from_pretrained(pretrain, trust_remote_code=True, use_fast=use_fast)
@@ -14,22 +17,17 @@ def get_tokenizer(pretrain, model, padding_side="left", use_fast=True):
         model.config.pad_token_id = tokenizer.pad_token_id
     return tokenizer
 
-def get_reward_model(base_causal_model, base_llm_model, is_general_preference: bool=False, add_prompt_head: bool=False, value_head_dim: int=2):
+def get_reward_model(base_causal_model, base_llm_model, value_head_dim: int, add_prompt_head: bool, is_general_preference: bool=False):
     class CustomRewardModel(base_causal_model):
 
         def __init__(self, config: AutoConfig):
             super().__init__(config)
             setattr(self, self.base_model_prefix, base_llm_model(config))
-            if not is_general_preference:
-                self.value_head = nn.Linear(config.hidden_size, 1, bias=False)
-            else: 
-                self.value_head = nn.Linear(config.hidden_size, value_head_dim, bias=False) 
-                if add_prompt_head:
-                    self.prompt_head = nn.Linear(config.hidden_size, value_head_dim // 2, bias=False) 
-        
-            self.is_general_preference = is_general_preference    
+            self.is_general_preference = is_general_preference   
             
-            self.post_init()
+            self.value_head = nn.Linear(config.hidden_size, value_head_dim, bias=False) 
+            if add_prompt_head:
+                self.prompt_head = nn.Linear(config.hidden_size, value_head_dim // 2, bias=False)
 
         def custom_forward(
             self,
@@ -66,7 +64,7 @@ def get_reward_model(base_causal_model, base_llm_model, is_general_preference: b
                     eos_indices = attention_mask.size(1) - 1 - attention_mask.long().fliplr().argmax(dim=1)
                     eos_indices = eos_indices.unsqueeze(1)  # Change shape to [batch_size, 1]                  
                     reward_list = []
-                    for dim in range(value_head_dim):
+                    for dim in range(self.value_head.out_features):
                         reward_list.append(values[:,:,dim].gather(dim=1, index=eos_indices))
                     reward = torch.cat(reward_list, dim=1)
                     reward =  F.normalize(reward, p=2, dim=-1)  # Shape will be [batch_size, value_head_dim]
@@ -120,11 +118,10 @@ def generate_high_dim_result_with_prompt(model, value_head_dim, chosen_reward, r
     return result
 
 class GPMPipeline:
-    def __init__(self, model_name_or_path, device=torch.device("cuda:0"), is_general_preference: bool=True, add_prompt_head: bool=True, value_head_dim: int=2, bf16: bool=True, truncation: bool=True, max_length: int=4096, padding: bool=True, tau: float=0.1):
+    def __init__(self, model_name_or_path, device=torch.device("cuda:0"), is_general_preference: bool=True, bf16: bool=True, truncation: bool=True, max_length: int=4096, padding: bool=True, tau: float=0.1):
         self.device = device
         self.is_general_preference = is_general_preference
-        self.add_prompt_head = add_prompt_head
-        self.value_head_dim = value_head_dim
+
         self.truncation = truncation
         self.max_length = max_length
         self.padding = padding
@@ -134,7 +131,24 @@ class GPMPipeline:
         config._attn_implementation = "flash_attention_2" 
         base_class = AutoModel._model_mapping[type(config)]
         base_causal_class = AutoModelForCausalLM._model_mapping.get(type(config), None)
-        cls_class = get_reward_model(base_causal_class, base_class, is_general_preference, add_prompt_head, value_head_dim)
+
+        try:
+            dir_path = snapshot_download(repo_id=model_name_or_path)
+        except Exception as e:
+            dir_path = model_name_or_path
+        combined_weights = {}
+        for filename in os.listdir(dir_path):
+            if filename.endswith(".safetensors"):
+                file_path = os.path.join(dir_path, filename)
+                weights = load_file(file_path)
+                combined_weights.update(weights)
+
+        if "value_head.weight" in combined_weights:
+            self.value_head_dim = combined_weights["value_head.weight"].shape[0]
+
+        self.add_prompt_head = True if "prompt_head.weight" in combined_weights else False
+
+        cls_class = get_reward_model(base_causal_class, base_class, add_prompt_head=self.add_prompt_head, value_head_dim=self.value_head_dim, is_general_preference=is_general_preference)
 
         # configure model
         self.model = cls_class.from_pretrained(
@@ -143,6 +157,7 @@ class GPMPipeline:
             trust_remote_code=True,
             torch_dtype=torch.bfloat16 if bf16 else "auto",
         )
+        
         # configure tokenizer
         self.tokenizer = get_tokenizer(model_name_or_path, self.model, "left", use_fast=True)
         self.tokenizer.truncation_side = "right"
@@ -212,13 +227,13 @@ context2 = [
     {"role": "user", "content": prompt_text},
     {"role": "assistant", "content": response2}
 ]
-
-rm = GPMPipeline("general-preference/GPM-Llama-3.1-8B", value_head_dim=4)
+rm = GPMPipeline("general-preference/GPM-Gemma-2B")
 
 reward1, prompt_hidden_state = rm([context1], return_prompt=True)
 reward2 = rm([context2])
 
 result = generate_high_dim_result_with_prompt(rm.model, rm.value_head_dim, reward1, reward2, prompt_hidden_state)
+# score = result / rm.tau
 
 result_batch = result.float().cpu().detach().numpy().tolist()
 
