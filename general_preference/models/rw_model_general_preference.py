@@ -206,7 +206,8 @@ def _get_reward_model(base_causal_model, base_llm_model, is_general_preference: 
 
                 # Pass through the linear layer to get the block diagonal entries (half of the matrix's off-diagonal blocks)
                 block_values = self.prompt_head(prompt_hidden_states).view(batch_size, dim // 2)
-                block_values = torch.softmax(block_values, dim=-1)
+                block_values = torch.softmax(block_values / math.sqrt(hidden_dim), dim=-1)
+                block_values = block_values * block_values.shape[-1]
                 
                 # Create a batch of zero matrices [batch_size, dim, dim]
                 batch_R_matrices = torch.zeros((batch_size, dim, dim), device=device, dtype=dtype)
