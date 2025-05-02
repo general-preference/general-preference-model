@@ -1,6 +1,6 @@
 # General Preference Model (GPM)
 
-Beyond Bradley-Terry Models: A General Preference
+[ICML 2025] Beyond Bradley-Terry Models: A General Preference
 Model for Language Model Alignment, [https://arxiv.org/abs/2410.02197](https://arxiv.org/abs/2410.02197)
 
 As Huggingface Daily Papers: [https://huggingface.co/papers/2410.02197](https://huggingface.co/papers/2410.02197)
@@ -78,7 +78,7 @@ print(result_batch)
 
 ## Citations
 
-Please cite the paper and star this repo if you use the General Preference Representation Model (GPM) and General Preference Optimization (GPO) and find it interesting/useful, thanks! Feel free to contact zhangge19951114@gmail.com | zhangyif21@mails.tsinghua.edu.cn or open an issue if you have any questions.
+Please cite the paper and star this repo if you use the General Preference Representation Model (GPM) and General Preference Optimization (GPO) and find it interesting/useful, thanks! Feel free to contact zhangge19951114@gmail.com | yif-zhang@outlook.com or open an issue if you have any questions.
 
 ```
 @article{zhang2024general,
