@@ -13,6 +13,8 @@ This repository is designed for training and evaluating the General Preference r
 
 * Evaluation code adapted from [RewardBench](https://github.com/allenai/reward-bench) for evaluating GPM and BT RM.
 
+* Code for LLM Alignment using GPM + GPO/SPPO: `./LLM-Alignment`.
+
 ## Key Components:
 
 `scripts/run_train_rm_general_preference_single.sh`: Run training for reward models on a single node. `scripts/run_train_rm_general_preference_multi.sh`: Run training for reward models across multiple nodes.  
