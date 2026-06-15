@@ -88,9 +88,12 @@ print(result_batch)
 Please cite the paper and star this repo if you use the General Preference embedding Model (GPM) and General Preference Optimization (GPO) and find it interesting/useful, thanks! Feel free to contact zhangge19951114@gmail.com | yifanzhangresearch@gmail.com or open an issue if you have any questions.
 
 ```
-@inproceedings{zhang2024beyond,
+@inproceedings{zhang2025beyond,
   title={Beyond Bradley-Terry Models: A General Preference Model for Language Model Alignment},
   author={Zhang, Yifan and Zhang, Ge and Wu, Yue and Xu, Kangping and Gu, Quanquan},
-  booktitle={Forty-second International Conference on Machine Learning}
+  booktitle={International Conference on Machine Learning},
+  pages={76939--76965},
+  year={2025},
+  organization={PMLR}
 }
 ```
