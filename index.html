@@ -1,252 +1,220 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>[ICML 2025] Beyond Bradley-Terry Models: A General Preference Model for Language Model Alignment</title>
-
-    <meta name="description" content="A general preference model (GPM) that uses preference embedding to capture complex and intransitive human preferences for language model alignment, outperforming traditional Bradley-Terry models.">
-    <meta name="keywords" content="ICML 2025, General Preference Model, GPM, Language Model Alignment, Preference Embedding, RLHF, Bradley-Terry Model, Intransitive Preferences">
-    <!-- Google Scholar / Highwire meta -->
-    <meta name="citation_title" content="Beyond Bradley-Terry Models: A General Preference Model for Language Model Alignment">
-    <meta name="citation_author" content="Yifan Zhang">
-    <meta name="citation_author" content="Ge Zhang">
-    <meta name="citation_author" content="Yue Wu">
-    <meta name="citation_author" content="Kangping Xu">
-    <meta name="citation_author" content="Quanquan Gu">
-    <meta name="citation_publication_date" content="2024/10/03">
-    <meta name="citation_pdf_url" content="https://arxiv.org/pdf/2410.02197.pdf">
-
-    <meta property="og:title" content="Beyond Bradley-Terry Models: A General Preference Model for Language Model Alignment"/>
-    <meta property="og:description" content="GPM introduces preference embedding to efficiently model complex preference structures, including intransitive ones, for better language model alignment."/>
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://general-preference.github.io/general-preference-model/" />
-    <link rel="canonical" href="https://general-preference.github.io/general-preference-model/">
-    <link rel="icon" href="https://placehold.co/32x32/4A90E2/FFFFFF?text=GP" type="image/x-icon">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.4/css/bulma.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <script>
-        MathJax = {
-            tex: {
-                inlineMath: [['$', '$'], ['\\(', '\\)']],
-                displayMath: [['$$', '$$'], ['\\[', '\\]']],
-            },
-            svg: { fontCache: 'global' }
-        };
-    </script>
-    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GPM — Beyond Bradley-Terry Models: A General Preference Model</title>
+  <meta name="description" content="A General Preference Model (GPM) using preference embedding to capture complex and intransitive human preferences for language model alignment, beyond Bradley-Terry reward models.">
+  <meta name="citation_title" content="Beyond Bradley-Terry Models: A General Preference Model for Language Model Alignment">
+  <meta name="citation_author" content="Yifan Zhang"><meta name="citation_author" content="Ge Zhang"><meta name="citation_author" content="Yue Wu"><meta name="citation_author" content="Kangping Xu"><meta name="citation_author" content="Quanquan Gu">
+  <meta name="citation_publication_date" content="2024/10/03">
+  <meta name="citation_pdf_url" content="https://arxiv.org/pdf/2410.02197.pdf">
+  <meta property="og:title" content="Beyond Bradley-Terry Models: A General Preference Model for Language Model Alignment"/>
+  <meta property="og:description" content="GPM introduces preference embedding to efficiently model complex, intransitive preferences for language model alignment."/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://general-preference.github.io/general-preference-model/"/>
+  <link rel="canonical" href="https://general-preference.github.io/general-preference-model/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230A0A0A'/%3E%3Ctext x='50' y='55' font-family='Arial,sans-serif' font-size='44' font-weight='700' fill='white' text-anchor='middle' dominant-baseline='central'%3EYZ%3C/text%3E%3C/svg%3E" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},svg:{fontCache:'global'}};</script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
     <style>
-        :root {
-            --primary-color: #004080; /* Lighter navy blue */
-            --accent-color: #CFB87C; 
-            --main-bg: #FFFFFF; /* Brighter main background */
-            --content-bg: #F8F9FA; /* Light grey for content sections */
-            --text-main: #363636;
-            --text-on-primary: #FFFFFF;
-            --link-color: var(--primary-color);
-            --link-hover-color: var(--accent-color);
-            --border-color: #e0e0e0;
-            --shadow-color: rgba(0, 0, 0, 0.1);
-        }
+    /* ===== Monochrome system (OpenAI x SpaceX) — skins existing markup ===== */
+    :root{
+      --bg:#FFFFFF; --bg-subtle:#F7F7F5; --bg-subtle-2:#EFEFEC;
+      --ink:#0A0A0A; --ink-2:#3A3A3A; --ink-3:#6B6B6B; --line:#E7E7E3;
+      --d-bg:#0A0A0A; --d-ink:#FFFFFF; --d-ink-2:rgba(255,255,255,.62);
+      --d-ink-3:rgba(255,255,255,.42); --d-line:rgba(255,255,255,.14);
+      --nav-h:68px; --maxw:1120px; --readw:1120px; --ease:cubic-bezier(.22,.61,.36,1);
+      --primary-color:#0A0A0A; --accent-color:#0A0A0A; --content-bg:#F7F7F5;
+      --border-color:#E7E7E3; --text-main:#3A3A3A; --text-on-primary:#FFFFFF;
+      --link-color:#0A0A0A; --link-hover-color:#0A0A0A; --primary-color-rgb:10,10,10; --link-color-rgb:10,10,10;
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+    body{margin:0;font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg);color:var(--ink);line-height:1.6;overflow-x:hidden;display:flex;flex-direction:column;min-height:100vh;
+      text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+    a{color:inherit;text-decoration:none} img{max-width:100%;display:block} ::selection{background:var(--ink);color:var(--bg)}
+    body.nav-open{overflow:hidden}
+    .container{width:100%;max-width:var(--maxw);margin:0 auto;padding-inline:clamp(1.25rem,5vw,3rem)}
+    .section.content-section .container{max-width:var(--readw)}
+    .has-text-centered{text-align:center!important} .has-text-justified{text-align:justify}
+    .has-text-grey{color:var(--ink-3)!important} .is-italic{font-style:italic}
+    .has-text-weight-bold{font-weight:700} .has-text-weight-medium{font-weight:500}
+    .is-size-3{font-size:1.5rem} .is-size-4{font-size:1.3rem} .is-size-5{font-size:1.15rem} .is-size-6{font-size:1rem} .is-size-7{font-size:.82rem}
+    .mb-6{margin-bottom:1.5rem!important} .mt-3{margin-top:.75rem!important} .mt-5{margin-top:1.25rem!important} .mt-6{margin-top:2rem!important}
+    .my-4{margin-top:1rem!important;margin-bottom:1rem!important} .my-5{margin-top:1.5rem!important;margin-bottom:1.5rem!important}
+    .tight{margin-top:.5rem!important;margin-bottom:.75rem!important}
+    .icon{display:inline-flex;align-items:center;justify-content:center}
+    hr{border:0;border-top:1px solid var(--line);margin:1rem 0}
 
-        html { scroll-behavior: smooth; }
+    /* Nav */
+    .navbar{position:fixed;inset:0 0 auto 0;z-index:200;height:var(--nav-h);display:flex;align-items:center;background:transparent;
+      border-bottom:1px solid transparent;transition:background .4s var(--ease),border-color .4s var(--ease),backdrop-filter .4s var(--ease)}
+    .navbar>.container{display:flex;align-items:center;justify-content:space-between}
+    .navbar-brand{display:flex;align-items:center;position:relative;z-index:160;min-height:auto}
+    .navbar-brand .navbar-item{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:1.05rem;letter-spacing:.14em;
+      text-transform:uppercase;color:var(--d-ink);padding:0;background:transparent!important;transition:color .4s var(--ease)}
+    .navbar-menu{display:flex;box-shadow:none;background:transparent;padding:0} .navbar-end{display:flex;align-items:center;gap:1.8rem;margin-left:auto}
+    .navbar-menu .navbar-item{position:relative;font-size:.78rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+      color:var(--d-ink-2);padding:.25rem 0;background:transparent!important;transition:color .25s var(--ease)}
+    .navbar-menu .navbar-item::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:currentColor;
+      transform:scaleX(0);transform-origin:left;transition:transform .3s var(--ease)}
+    .navbar-menu .navbar-item:hover{color:var(--d-ink)} .navbar-menu .navbar-item:hover::after{transform:scaleX(1)}
+    .navbar.is-scrolled{background:rgba(255,255,255,.82);backdrop-filter:saturate(180%) blur(20px);
+      -webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom-color:var(--line)}
+    .navbar.is-scrolled .navbar-brand .navbar-item{color:var(--ink)}
+    .navbar.is-scrolled .navbar-menu .navbar-item{color:var(--ink-3)}
+    .navbar.is-scrolled .navbar-menu .navbar-item:hover{color:var(--ink)}
+    .navbar-burger{display:none;position:relative;width:44px;height:44px;margin:0;background:none;border:0;cursor:pointer}
+    .navbar-burger span{position:absolute;left:13px;width:18px;height:1.5px;background:var(--d-ink);
+      transition:transform .35s var(--ease),opacity .2s var(--ease),background .4s var(--ease)}
+    .navbar-burger span:nth-child(1){top:18px} .navbar-burger span:nth-child(2){top:23px} .navbar-burger span:nth-child(3){top:28px}
+    .navbar.is-scrolled .navbar-burger span{background:var(--ink)}
+    .navbar-burger.is-active span{background:var(--d-ink)!important}
+    .navbar-burger.is-active span:nth-child(1){top:23px;transform:rotate(45deg)}
+    .navbar-burger.is-active span:nth-child(2){opacity:0}
+    .navbar-burger.is-active span:nth-child(3){top:23px;transform:rotate(-45deg)}
 
-        body {
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            background-color: var(--main-bg);
-            color: var(--text-main);
-            text-rendering: optimizeLegibility;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
+    /* Hero */
+    .hero{position:relative;background:var(--d-bg);color:var(--d-ink);overflow:hidden;padding-top:var(--nav-h);
+      min-height:62vh;min-height:62svh;display:flex;align-items:center}
+    .hero::before{content:"";position:absolute;inset:0;
+      background-image:linear-gradient(to right,rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.045) 1px,transparent 1px);
+      background-size:64px 64px;-webkit-mask-image:radial-gradient(ellipse 85% 75% at 50% 40%,#000 25%,transparent 78%);
+      mask-image:radial-gradient(ellipse 85% 75% at 50% 40%,#000 25%,transparent 78%)}
+    .hero::after{content:"";position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);width:80vw;height:80vw;
+      max-width:1000px;max-height:1000px;background:radial-gradient(circle,rgba(255,255,255,.11),transparent 62%);pointer-events:none}
+    .hero-body{position:relative;z-index:1;width:100%;padding-block:clamp(2.5rem,7vh,4.5rem)}
+    .hero .title{font-family:'Space Grotesk',sans-serif;font-weight:500;letter-spacing:-.035em;line-height:1.02;
+      color:var(--d-ink);font-size:clamp(2.4rem,6vw,4.6rem);margin-bottom:0}
+    .hero .subtitle{color:var(--d-ink-2)}
+    .hero .subtitle.is-hero-subtitle{color:var(--d-ink-2);font-size:clamp(1.05rem,1.7vw,1.35rem);max-width:820px;margin:1.2rem auto 0;font-weight:400;line-height:1.55}
+    .hero .subtitle .highlight{color:var(--d-ink);font-weight:500}
+    .hero .subtitle.is-4,.hero .subtitle.is-5{font-size:1.05rem;font-weight:500;margin-top:1.2rem;line-height:1.55}
+    .hero .subtitle.is-6{font-size:.85rem;margin-top:.4rem}
+    .hero .subtitle a,.authors-list a{color:var(--d-ink);border-bottom:1px solid var(--d-line)}
+    .hero .subtitle a:hover,.authors-list a:hover{border-bottom-color:var(--d-ink)}
+    .authors-list{font-size:1.02rem;line-height:1.7;margin-top:1.6rem;color:var(--d-ink-2);font-weight:500}
+    .affiliations{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--d-ink-3);margin-top:.7rem}
+    .project-links{margin-top:1.6rem}
+    .project-links a{color:var(--d-ink-2);font-size:1.2rem;margin:0 .55rem;transition:color .2s var(--ease),transform .2s var(--ease)}
+    .project-links a:hover{color:var(--d-ink);transform:translateY(-2px)}
+    .pill{display:inline-block;padding:.4rem .85rem;border-radius:100px;font-size:.68rem;font-weight:600;letter-spacing:.1em;
+      text-transform:uppercase;background:transparent;color:var(--d-ink-2);border:1px solid var(--d-line);margin:.22rem .2rem}
 
-        /* Sticky Navbar */
-        .navbar {
-            background-color: rgba(var(--primary-color-rgb), 0.9);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 2px 5px var(--shadow-color);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        .navbar-brand a.navbar-item, .navbar-menu a.navbar-item {
-            color: var(--text-on-primary);
-            font-weight: 500;
-        }
-        .navbar-brand a.navbar-item:hover, .navbar-menu a.navbar-item:hover, .navbar-item.is-active {
-            background-color: transparent !important;
-            color: var(--accent-color) !important;
-        }
-        .navbar-burger { color: var(--text-on-primary); }
+    /* Sections / body */
+    .section.content-section{padding-block:clamp(3.5rem,8vh,6rem);border-bottom:1px solid var(--line)}
+    .section.content-section:nth-child(even){background:var(--bg-subtle)}
+    .section.content-section:last-of-type{border-bottom:none}
+    .section-title,.title.is-3.section-title{font-family:'Space Grotesk',sans-serif;font-weight:600;letter-spacing:-.03em;line-height:1.1;
+      color:var(--ink);font-size:clamp(1.7rem,3.6vw,2.3rem);margin-bottom:1.75rem!important;text-align:left!important}
+    .content{max-width:var(--readw);margin:0 auto;line-height:1.8;font-size:1.06rem;color:var(--ink-2)}
+    .content .title.is-4,.title.is-4,.content h3{font-family:'Space Grotesk',sans-serif;font-weight:600;letter-spacing:-.02em;color:var(--ink);font-size:1.3rem;margin:2.1rem 0 1rem}
+    .content .title.is-5,.title.is-5,.content h4{font-family:'Space Grotesk',sans-serif;font-weight:600;color:var(--ink);font-size:1.12rem;margin:1.6rem 0 .6rem;line-height:1.3}
+    .content p{margin-bottom:1.2rem;color:var(--ink-2)} .content strong{color:var(--ink);font-weight:600}
+    .content a{color:var(--ink);border-bottom:1px solid var(--ink-3);font-weight:500;transition:border-color .2s var(--ease)}
+    .content a:hover{border-bottom-color:var(--ink)}
+    .content ul,.content ol{margin:0 0 1.2rem 1.4rem} .content li{margin-bottom:.5rem;color:var(--ink-2)}
+    .content img{display:block;margin:1.75rem auto;max-width:100%;border:1px solid var(--line);border-radius:12px}
+    .content figure{margin:1.75rem auto;text-align:center;max-width:100%}
+    .content figure img,figure img{margin:0 auto .6rem}
+    figcaption,.content figcaption{color:var(--ink-3);font-size:.85rem;line-height:1.6;max-width:820px;margin:.4rem auto 0}
+    .math-block{margin:1.6rem 0;overflow-x:auto;text-align:center}
+    .content pre,pre{background:var(--d-bg);color:#E7E7E3;border:1px solid var(--line);border-radius:12px;padding:1.2em 1.3em;overflow:auto;font-size:.9rem;margin:1.4rem 0;line-height:1.65}
+    code{background:var(--bg-subtle-2);color:var(--ink);padding:.16em .4em;border-radius:5px;font-size:85%}
+    pre code{background:transparent;color:inherit;padding:0;font-size:inherit}
+    .notification{position:relative;background:var(--bg-subtle);border-radius:0 10px 10px 0;padding:1.1rem 1.4rem;margin:1.6rem 0;color:var(--ink-2)}
+    .message{background:var(--bg-subtle);border-left:2px solid var(--ink);border-radius:0 10px 10px 0;margin:1.6rem 0}
+    .message-body{padding:1.1rem 1.4rem;color:var(--ink-2);border:0}
+    .box{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:1.5rem;margin:1rem 0;box-shadow:none;color:var(--ink-2)}
+    .has-background-light{background:var(--bg-subtle)!important}
+    .pillar-box,.book-item{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:1.25rem;height:100%;color:var(--ink-2);transition:transform .2s var(--ease),box-shadow .2s var(--ease)}
+    .book-item{font-size:.92rem;text-align:center}
+    .pillar-box:hover,.book-item:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(10,10,10,.06)}
+    .section.content-section:nth-child(even) :is(.notification,.message,.box,.pillar-box,.book-item,.diagram-container){background:#fff}
+    .columns{display:flex;flex-wrap:wrap;gap:1.5rem;margin:1rem 0} .columns.is-centered{justify-content:center} .columns.is-vcentered{align-items:center}
+    .column{flex:1 1 0;min-width:0;padding:0}
+    .column.is-4{flex:0 0 calc(33.333% - 1rem)} .column.is-5{flex:0 0 calc(41.666% - .75rem)}
+    .column.is-6,.column.is-half{flex:0 0 calc(50% - .75rem)} .column.is-one-quarter-desktop{flex:0 0 calc(25% - 1.125rem)}
+    .table-container{overflow-x:auto;margin:2rem 0;border:1px solid var(--line);border-radius:12px}
+    table.table,.table{width:100%;border-collapse:collapse;background:var(--bg);margin:0}
+    table.table th,.table th{background:var(--bg-subtle);color:var(--ink);font-weight:600;padding:1rem;text-align:left;border-bottom:2px solid var(--line)}
+    table.table td,.table td{padding:1rem;border-bottom:1px solid var(--line);color:var(--ink-2);vertical-align:top}
+    table.table tr:last-child td{border-bottom:none}
+    .diagram-container{width:100%;margin:2rem 0;text-align:center;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:1.5rem;display:block}
+    .diagram-container img{border:0;margin:0 auto}
+    .mini-caption{display:block;margin-top:.6rem;color:var(--ink-3);font-style:italic;font-size:.85rem;text-align:center}
+    .profile-image{width:100%;max-width:280px;aspect-ratio:1;object-fit:cover;border-radius:14px;border:1px solid var(--line);filter:grayscale(1)}
+    svg text{font-family:'Inter',sans-serif}
+    .button{display:inline-flex;align-items:center;gap:.5rem;padding:.6rem 1.1rem;border:1px solid var(--ink);border-radius:100px;
+      background:transparent;color:var(--ink);font-family:inherit;font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+      cursor:pointer;transition:background .2s var(--ease),color .2s var(--ease);margin:.25rem}
+    .button:hover,.button.is-primary,.button.is-success{background:var(--ink);color:var(--bg)!important;border-color:var(--ink)}
 
-        /* Hero Section */
-        .hero {
-            background: var(--primary-color);
-            color: var(--text-on-primary);
-        }
-        .hero .title {
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 700;
-            color: var(--text-on-primary);
-            font-size: 3.2rem;
-        }
-        .hero .subtitle.is-hero-subtitle {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 1.3rem;
-            max-width: 800px;
-            margin: 1.5rem auto 2.5rem auto;
-        }
-        .hero .subtitle .highlight {
-            color: var(--accent-color);
-            font-weight: 600;
-        }
-        .project-links a {
-            color: var(--text-on-primary);
-            font-size: 1.5rem;
-            margin: 0 0.75rem;
-            transition: color 0.3s ease, transform 0.3s ease;
-        }
-        .project-links a:hover {
-            color: var(--accent-color);
-            transform: translateY(-3px);
-        }
+    /* Footer */
+    .footer{background:var(--d-bg);color:var(--d-ink-2);padding-block:clamp(2.5rem,5vw,4rem);margin-top:auto;border-top:1px solid var(--d-line)}
+    .footer .content{max-width:var(--maxw);color:var(--d-ink-2)}
+    .footer .content p:first-child{font-size:.78rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem;line-height:2.1}
+    .footer a{color:var(--d-ink-2);font-weight:600;transition:color .2s var(--ease)} .footer a:hover{color:var(--d-ink)}
+    .footer .content p:last-child{font-size:.85rem;color:var(--d-ink-3);letter-spacing:0;text-transform:none;font-weight:400}
 
-        /* Content Sections */
-        .section.content-section {
-            padding: 5rem 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .section.content-section:nth-child(even) { background-color: var(--content-bg); }
-        .section-title {
-            font-family: 'Space Grotesk', sans-serif;
-            color: var(--primary-color);
-            font-weight: 700;
-            margin-bottom: 3rem;
-        }
-        .content {
-            max-width: 960px;
-            margin: 0 auto;
-            line-height: 1.8;
-            font-size: 1.05rem;
-        }
-        .content a {
-            color: var(--link-color);
-            font-weight: 500;
-            text-decoration: none;
-            border-bottom: 2px solid rgba(var(--link-color-rgb), 0.2);
-        }
-        .content a:hover {
-            color: var(--link-hover-color);
-            border-bottom-color: var(--link-hover-color);
-        }
-        .content img {
-            display: block;
-            margin: 2rem auto;
-            max-width: 100%;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        .content table.table {
-            border-radius: 6px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.07);
-        }
-        .content table th {
-            background-color: var(--primary-color);
-            color: var(--text-on-primary) !important;
-        }
-        .content pre {
-            background-color: #282c34;
-            color: #abb2bf;
-            border-radius: 6px;
-            padding: 1.25em;
-        }
+    @media(max-width:1023px){ .column.is-half-tablet,.column.is-one-quarter-desktop{flex:0 0 calc(50% - .75rem)} }
+    @media(max-width:820px){
+      .navbar-burger{display:block}
+      .navbar-menu{position:fixed;inset:0;background:var(--d-bg);flex-direction:column;justify-content:center;align-items:center;gap:1.5rem;
+        opacity:0;visibility:hidden;transform:translateY(-8px);z-index:150;transition:opacity .4s var(--ease),transform .4s var(--ease),visibility .4s}
+      .navbar-menu.is-active{opacity:1;visibility:visible;transform:none}
+      .navbar-end{flex-direction:column;gap:1.5rem;margin-left:0}
+      .navbar-menu .navbar-item{font-family:'Space Grotesk',sans-serif;font-size:1.4rem;font-weight:500;letter-spacing:-.01em;text-transform:none}
+      .navbar-menu .navbar-item::after{display:none}
+      .column,.column.is-4,.column.is-5,.column.is-6,.column.is-half,.column.is-half-tablet,.column.is-one-quarter-desktop{flex:1 1 100%}
+    }
+    @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} }
+  </style>
 
-        /* Footer */
-        .footer {
-            background: var(--primary-color);
-            color: var(--text-on-primary);
-            padding: 2rem 1.5rem;
-            border-top: 4px solid var(--accent-color);
-            margin-top: auto;
-        }
-        .footer .content p { color: var(--text-on-primary); }
-        .footer a {
-            color: var(--accent-color);
-            font-weight: 500;
-        }
-        .footer a:hover { color: var(--text-on-primary); }
-
-        /* Responsive Design */
-        @media (max-width: 1023px) {
-            .navbar-menu {
-                background-color: rgba(var(--primary-color-rgb), 0.95);
-                backdrop-filter: blur(5px);
-            }
-        }
-        @media (max-width: 768px) {
-            .hero .title { font-size: 2.2rem; }
-            .hero .subtitle.is-hero-subtitle { font-size: 1.1rem; }
-        }
-    </style>
 </head>
 <body>
-
-    <nav class="navbar" role="navigation" aria-label="main navigation">
-        <div class="container">
-            <div class="navbar-brand">
-                <a class="navbar-item is-size-5 has-text-weight-bold" href="#">General Preference Model</a>
-                <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarMenu">
-                    <span aria-hidden="true"></span>
-                    <span aria-hidden="true"></span>
-                    <span aria-hidden="true"></span>
-                </a>
-            </div>
-            <div id="navbarMenu" class="navbar-menu">
-                <div class="navbar-end">
-                    <a href="#about" class="navbar-item">About</a>
-                    <a href="#model" class="navbar-item">Model</a>
-                    <a href="#results" class="navbar-item">Results</a>
-                    <a href="#gpo" class="navbar-item">GPO</a>
-                    <a href="#citation" class="navbar-item">Citation</a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <header class="hero is-medium">
-        <div class="hero-body">
-            <div class="container has-text-centered">
-                <h1 class="title">[ICML 2025] Beyond Bradley-Terry Models: A General Preference Model for Language Model Alignment</h1>
-                <h2 class="subtitle is-hero-subtitle">
-                    Introducing <span class="highlight">preference embedding</span>, a novel approach to capture complex and intransitive human preferences for aligning language models with human values.
-                </h2>
-                <h3 class="subtitle is-5" style="color: rgba(255, 255, 255, 0.9); margin-top: 2rem; margin-bottom: 2rem;">
-                   <a href="https://yifzhang.com" style="color: var(--accent-color); font-weight: 600; text-decoration: none; border-bottom: 1px solid rgba(207, 184, 124, 0.6);">Yifan Zhang</a><span style="padding: 0 0.5em;"></span>
-                   <a href="#" style="color: var(--accent-color); font-weight: 600; text-decoration: none; border-bottom: 1px solid rgba(207, 184, 124, 0.6);">Ge Zhang</a><span style="padding: 0 0.5em;"></span>
-                   <a href="#" style="color: var(--accent-color); font-weight: 600; text-decoration: none; border-bottom: 1px solid rgba(207, 184, 124, 0.6);">Yue Wu</a><span style="padding: 0 0.5em;"></span>
-                   <a href="#" style="color: var(--accent-color); font-weight: 600; text-decoration: none; border-bottom: 1px solid rgba(207, 184, 124, 0.6);">Kangping Xu</a><span style="padding: 0 0.5em;"></span>
-                   <a href="https://www.cs.ucla.edu/~qgu/" target="_blank" rel="noopener noreferrer" style="color: var(--accent-color); font-weight: 600; text-decoration: none; border-bottom: 1px solid rgba(207, 184, 124, 0.6);">Quanquan Gu</a>
-                </h3>
-                <div class="project-links">
-                    <a href="https://arxiv.org/pdf/2410.02197.pdf" target="_blank" rel="noopener noreferrer" aria-label="Paper"><i class="fas fa-file-pdf"></i></a>
-                    <a href="https://arxiv.org/abs/2410.02197" target="_blank" rel="noopener noreferrer" aria-label="arXiv"><i class="fas fa-graduation-cap"></i></a>
-                    <a href="https://github.com/general-preference/general-preference-model" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
-                    <a href="#citation" aria-label="Citation"><i class="fas fa-quote-right"></i></a>
-                </div>
-            </div>
-        </div>
-    </header>
-
+  <nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="container">
+      <div class="navbar-brand">
+        <a class="navbar-item" href="#">GPM</a>
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarMenu"><span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span></a>
+      </div>
+      <div id="navbarMenu" class="navbar-menu"><div class="navbar-end">
+          <a href="#about" class="navbar-item">Abstract</a>
+          <a href="#model" class="navbar-item">Model</a>
+          <a href="#results" class="navbar-item">Results</a>
+          <a href="#citation" class="navbar-item">Citation</a>
+          <a href="https://yfz.ai/blog" class="navbar-item">Blog</a>
+        </div></div>
+    </div>
+  </nav>
+  <header class="hero is-medium">
+    <div class="hero-body"><div class="container has-text-centered">
+      <h1 class="title">Beyond Bradley-Terry Models</h1>
+      <h2 class="subtitle is-hero-subtitle"><span class="highlight">A General Preference Model for Language Model Alignment</span><br>Introducing preference embedding to capture complex and intransitive human preferences &mdash; beyond scalar Bradley-Terry reward models.</h2>
+      <div class="authors-list"><a href="https://yifzhang.com" target="_blank" rel="noopener">Yifan Zhang</a> &middot; Ge Zhang &middot; Yue Wu &middot; Kangping Xu &middot; <a href="https://www.cs.ucla.edu/~qgu/" target="_blank" rel="noopener">Quanquan Gu</a></div>
+      <div class="affiliations">ICML 2025 &nbsp;&middot;&nbsp; arXiv:2410.02197</div>
+      <div class="project-links">
+          <a href="https://arxiv.org/pdf/2410.02197.pdf" target="_blank" rel="noopener" aria-label="Paper PDF"><i class="fas fa-file-pdf"></i></a>
+          <a href="https://arxiv.org/abs/2410.02197" target="_blank" rel="noopener" aria-label="arXiv"><i class="fas fa-graduation-cap"></i></a>
+          <a href="https://github.com/general-preference/general-preference-model" target="_blank" rel="noopener" aria-label="GitHub"><i class="fab fa-github"></i></a>
+          <a href="https://huggingface.co/papers/2410.02197" target="_blank" rel="noopener" aria-label="Hugging Face">🤗</a>
+          <a href="#citation" aria-label="Citation"><i class="fas fa-quote-right"></i></a>
+      </div>
+      <div style="margin-top:1.25rem;">
+          <span class="pill">Preference Embedding</span>
+          <span class="pill">RLHF</span>
+          <span class="pill">Intransitive Preferences</span>
+          <span class="pill">GPO</span>
+      </div>
+    </div></div>
+  </header>
     <main>
         <section id="about" class="section content-section">
             <div class="container">
@@ -369,66 +337,44 @@
             </div>
         </section>
     </main>
-
-    <footer class="footer">
-        <div class="container">
-            <div class="content has-text-centered">
-                <p>
-                    <a href="#about">About</a> &nbsp;&bull;&nbsp;
-                    <a href="#model">Model</a> &nbsp;&bull;&nbsp;
-                    <a href="#results">Results</a> &nbsp;&bull;&nbsp;
-                    <a href="#gpo">GPO</a> &nbsp;&bull;&nbsp;
-                    <a href="#citation">Citation</a>
-                </p>
-                <p>
-                    &copy; 2025 General Preference Model (GPM) Team. All rights reserved.
-                </p>
-            </div>
-        </div>
-    </footer>
-
+  <footer class="footer"><div class="container"><div class="content has-text-centered">
+    <p><a href="#about">Abstract</a> &nbsp;&bull;&nbsp;
+          <a href="#model">Model</a> &nbsp;&bull;&nbsp;
+          <a href="#results">Results</a> &nbsp;&bull;&nbsp;
+          <a href="#citation">Citation</a> &nbsp;&bull;&nbsp;
+          <a href="https://github.com/general-preference/general-preference-model">GitHub</a> &nbsp;&bull;&nbsp;
+          <a href="https://yfz.ai/blog">Yifan's Blog</a></p>
+    <p>&copy; 2025 General Preference Model (GPM) Team.</p>
+  </div></div></footer>
     <script>
-        // JavaScript for the mobile navbar toggle
-        document.addEventListener('DOMContentLoaded', () => {
-            const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
-            if ($navbarBurgers.length > 0) {
-                $navbarBurgers.forEach( el => {
-                    el.addEventListener('click', () => {
-                        const target = el.dataset.target;
-                        const $target = document.getElementById(target);
-                        el.classList.toggle('is-active');
-                        $target.classList.toggle('is-active');
-                    });
-                });
-            }
-
-            // Function to convert hex to rgb for rgba() usage
-            function hexToRgb(hex) {
-                let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-                return result ? {
-                    r: parseInt(result[1], 16),
-                    g: parseInt(result[2], 16),
-                    b: parseInt(result[3], 16)
-                } : null;
-            }
-
-            // Set RGB versions of colors for use in rgba()
-            const root = document.documentElement;
-            const styles = getComputedStyle(root);
-            const primaryColor = styles.getPropertyValue('--primary-color').trim();
-            const linkColor = styles.getPropertyValue('--link-color').trim();
-
-            const primaryRgb = hexToRgb(primaryColor);
-            if (primaryRgb) {
-                root.style.setProperty('--primary-color-rgb', `${primaryRgb.r}, ${primaryRgb.g}, ${primaryRgb.b}`);
-            }
-
-            const linkRgb = hexToRgb(linkColor);
-            if (linkRgb) {
-                 root.style.setProperty('--link-color-rgb', `${linkRgb.r}, ${linkRgb.g}, ${linkRgb.b}`);
-            }
-        });
-    </script>
-
+    document.addEventListener('DOMContentLoaded', () => {
+      const navbar = document.querySelector('.navbar');
+      const hero = document.querySelector('.hero');
+      const burgers = Array.from(document.querySelectorAll('.navbar-burger'));
+      if (navbar && hero && 'IntersectionObserver' in window) {
+        new IntersectionObserver(([e]) => navbar.classList.toggle('is-scrolled', !e.isIntersecting),
+          { rootMargin: '-69px 0px 0px 0px', threshold: 0 }).observe(hero);
+      }
+      const closeMenu = () => {
+        document.querySelectorAll('.navbar-burger.is-active').forEach(b => b.classList.remove('is-active'));
+        document.querySelectorAll('.navbar-menu.is-active').forEach(m => m.classList.remove('is-active'));
+        document.body.classList.remove('nav-open');
+      };
+      burgers.forEach(el => el.addEventListener('click', () => {
+        const target = document.getElementById(el.dataset.target);
+        el.classList.toggle('is-active'); if (target) target.classList.toggle('is-active');
+        document.body.classList.toggle('nav-open', el.classList.contains('is-active'));
+      }));
+      document.querySelectorAll('.navbar-menu .navbar-item').forEach(a => a.addEventListener('click', closeMenu));
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
+      const btn = document.getElementById('copy-cite'), pre = document.getElementById('cite-bibtex');
+      if (btn && pre) { btn.addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(pre.innerText); btn.classList.add('is-success');
+          btn.innerHTML = '<span class="icon"><i class="fas fa-check"></i></span><span>Copied</span>';
+          setTimeout(() => { btn.classList.remove('is-success'); btn.innerHTML = '<span class="icon"><i class="fas fa-clipboard"></i></span><span>Copy BibTeX</span>'; }, 1600);
+        } catch (e) { const r=document.createRange(); r.selectNode(pre); const s=window.getSelection(); s.removeAllRanges(); s.addRange(r); try{document.execCommand('copy')}catch(_){}; s.removeAllRanges(); }
+      }); }
+    });
+  </script>
 </body>
 </html>
